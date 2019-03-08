@@ -1,0 +1,27 @@
+### CHANGE THIS TO PYTHON-BASED-BUILD
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - apk update
+  - apk add nodejs
+  - apk add npm
+
+build:
+  stage: build
+  script:
+    - cd static_src
+    - npm install
+    - npm run build
+    - cd ../
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG

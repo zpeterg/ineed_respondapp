@@ -1,0 +1,29 @@
+{
+  consul: "localhost:8500",
+  logging: {
+    level: "INFO",
+    format: "default",
+    output: "stdout"
+  },
+  jobs: [
+    {
+      name: "respond-app",
+      exec: "python manage.py runserver 0.0.0.0:8000",
+      restarts: "unlimited",
+      port: 8000,
+      health: {
+        exec: "/usr/bin/curl --fail -s -o /dev/null http://localhost:8000/chat/health",
+        interval: 5,
+        ttl: 10,
+        timeout: "5s",
+      },
+      tags: [
+        "respond-app",
+      ],
+      interfaces: [
+        "eth1",           // host address for dev
+        "eth0",           // used on AWS
+      ],
+    },
+  ],
+}
